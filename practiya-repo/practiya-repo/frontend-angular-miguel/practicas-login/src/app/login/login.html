@@ -1,0 +1,39 @@
+<form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+
+  <label>Correo electrónico</label>
+  <input
+    type="email"
+    [(ngModel)]="email"
+    name="email"
+    required
+    email
+    #emailField="ngModel"
+  />
+  @if (emailField.invalid && emailField.touched) {
+    <p class="error">Ingresa un correo válido</p>
+  }
+
+  <label>Contraseña</label>
+  <input
+    type="password"
+    [(ngModel)]="password"
+    name="password"
+    required
+    minlength="6"
+    #passwordField="ngModel"
+  />
+  @if (passwordField.invalid && passwordField.touched) {
+    <p class="error">La contraseña debe tener al menos 6 caracteres</p>
+  }
+
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+  }
+
+  @if (loading) {
+    <p>Iniciando sesión...</p>
+  }
+
+  <button type="submit" [disabled]="loginForm.invalid || loading">Iniciar sesión</button>
+
+</form>
