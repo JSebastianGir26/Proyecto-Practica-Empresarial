@@ -1,0 +1,48 @@
+########################################################################
+# PractiYA — Backend (Django + DRF)
+# Despliegue: Render (API) + Supabase (PostgreSQL y Storage)
+#
+# Para instalar:  pip install -r requirements.txt
+# Si agregas una librería nueva, anótala aquí con su versión exacta
+# y menciónalo en tu Pull Request para que el resto del equipo la instale.
+########################################################################
+
+# --- Framework principal ---
+Django==5.1.4
+djangorestframework==3.15.2
+
+# --- Base de datos (PostgreSQL en Supabase) ---
+psycopg[binary]==3.2.3
+
+# --- Autenticación (JWT para consumo desde Next.js) ---
+djangorestframework-simplejwt==5.3.1
+
+# --- CORS (el frontend en Vercel vive en otro dominio) ---
+django-cors-headers==4.6.0
+
+# --- Variables de entorno (.env) ---
+django-environ==0.11.2
+
+# --- Filtros de búsqueda (HU-06: modalidad, ciudad, palabra clave) ---
+django-filter==24.3
+
+# --- Imágenes (logos de empresa, foto de perfil) ---
+Pillow==11.0.0
+
+# --- Archivos subidos (hojas de vida, logos) en Supabase Storage ---
+django-storages[s3]==1.14.4
+
+# --- Producción en Render ---
+gunicorn==23.0.0
+whitenoise==6.8.2
+
+# --- Calidad de código ---
+black==24.10.0
+flake8==7.1.1
+
+# --- Pruebas ---
+pytest==8.3.4
+pytest-django==4.9.0
+
+# NOTA: el chat en tiempo real (Django Channels + Redis) quedó fuera del MVP.
+# Se agrega cuando el equipo tome la app `messaging`.

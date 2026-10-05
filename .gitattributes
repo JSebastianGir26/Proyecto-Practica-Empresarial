@@ -1,0 +1,14 @@
+# Todos los archivos de texto se guardan en el repo con saltos de línea
+# LF, aunque el equipo trabaje en Windows. Evita conflictos falsos
+# donde "cambia todo el archivo" sin haber cambiado nada.
+* text=auto eol=lf
+
+*.sh text eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+*.xlsx binary
+*.pptx binary
+*.png binary
+*.jpg binary
+*.pdf binary
