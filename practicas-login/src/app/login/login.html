@@ -1,0 +1,54 @@
+<div class="login-container">
+  <div class="login-card">
+    <h1 class="login-title">PractiYA</h1>
+    <p class="login-subtitle">Inicia sesión en tu cuenta</p>
+
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+
+      <div class="form-group">
+        <label>Correo electrónico</label>
+        <input
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          required
+          email
+          #emailField="ngModel"
+          placeholder="correo@ejemplo.com"
+        />
+        @if (emailField.invalid && emailField.touched) {
+          <p class="error">Ingresa un correo válido</p>
+        }
+      </div>
+
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          required
+          minlength="6"
+          #passwordField="ngModel"
+          placeholder="••••••••"
+        />
+        @if (passwordField.invalid && passwordField.touched) {
+          <p class="error">La contraseña debe tener al menos 6 caracteres</p>
+        }
+      </div>
+
+      @if (errorMessage) {
+        <p class="error">{{ errorMessage }}</p>
+      }
+
+      @if (loading) {
+        <p class="loading-text">Iniciando sesión...</p>
+      }
+
+      <button type="submit" [disabled]="loginForm.invalid || loading">
+        Iniciar sesión
+      </button>
+
+    </form>
+  </div>
+</div>
