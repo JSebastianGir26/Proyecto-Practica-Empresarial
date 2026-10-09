@@ -1,13 +1,11 @@
 # apps/applications
 
-**Epica:** Epic 3 - Busqueda y postulacion (seguimiento)
-**Historias de usuario:** HU-10 Seguir mis postulaciones
+**Épica:** Epic 3 / Epic 5 - Postulaciones
+**Historias de usuario:** HU-08 Postularme, HU-10 Seguir mis postulaciones, HU-16 Gestionar postulantes
 
-Esta app todavia esta vacia — es un placeholder para que el equipo
-tenga claro donde va a vivir este trabajo cuando se tome en un
-proximo sprint. No agregues codigo aqui hasta que la historia
-correspondiente este planificada.
+Implementada en el MVP.
 
-Al implementarla, sigue la misma estructura que `apps/accounts`:
-`models.py`, `serializers.py`, `views.py`, `urls.py`, `admin.py`,
-`permissions.py` si aplica, y pruebas en `tests/`.
+- `Application`: estudiante + vacante (única por pareja) con estado `APLICADO → EN_REVISION → ENTREVISTA → ACEPTADO | RECHAZADO`.
+- Postularse exige hoja de vida (`code: cv_required`); repetir devuelve `code: already_applied`.
+
+Pruebas en `tests/`: cada escenario Gherkin del backlog tiene al menos una.

@@ -1,13 +1,11 @@
 # apps/moderation
 
-**Epica:** Epic 7 - Moderacion
+**Épica:** Epic 7 - Moderación
 **Historias de usuario:** HU-19 Aprobar empresas y vacantes
 
-Esta app todavia esta vacia — es un placeholder para que el equipo
-tenga claro donde va a vivir este trabajo cuando se tome en un
-proximo sprint. No agregues codigo aqui hasta que la historia
-correspondiente este planificada.
+Implementada en el MVP.
 
-Al implementarla, sigue la misma estructura que `apps/accounts`:
-`models.py`, `serializers.py`, `views.py`, `urls.py`, `admin.py`,
-`permissions.py` si aplica, y pruebas en `tests/`.
+- No tiene tablas: el estado vive en `CompanyProfile.status` y `Vacancy.status`.
+- `models.aprobar()` y `models.rechazar()` los usan el Django Admin (acciones en `companies/admin.py` y `jobs/admin.py`) y la API `/api/moderacion/` (pantalla `/moderacion`).
+
+Pruebas en `tests/`: cada escenario Gherkin del backlog tiene al menos una.
