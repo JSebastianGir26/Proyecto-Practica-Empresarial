@@ -48,10 +48,10 @@ class StudentProfile(models.Model):
     CAMPOS_COMPLETITUD = [
         ("full_name", "Nombre completo"),
         ("program", "Carrera o programa"),
-        ("institution", "Institucion"),
+        ("institution", "Institución"),
         ("semester", "Semestre"),
         ("city", "Ciudad"),
-        ("about", "Sobre mi"),
+        ("about", "Sobre mí"),
         ("skills", "Habilidades"),
         ("cv", "Hoja de vida"),
     ]

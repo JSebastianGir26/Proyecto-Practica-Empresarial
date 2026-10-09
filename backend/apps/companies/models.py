@@ -61,10 +61,21 @@ class CompanyProfile(models.Model):
     def is_approved(self):
         return self.status == ReviewStatus.APROBADA
 
+    SUFIJOS_SOCIETARIOS = {
+        "sas", "s.a.s", "s.a.s.", "sa", "s.a", "s.a.", "ltda", "ltda.", "e.u", "e.u.", "y", "de", "la",
+    }
+
     @property
     def initials(self):
-        palabras = [p for p in self.display_name.replace(".", " ").split() if p[0].isalnum()]
-        return "".join(p[0] for p in palabras[:2]).upper() or "?"
+        """'TechNova S.A.S.' → 'TN', 'Grupo Andina Logística' → 'GA' (mockup)."""
+        palabras = [p for p in self.display_name.split() if p.lower() not in self.SUFIJOS_SOCIETARIOS]
+        if not palabras:
+            return "?"
+        if len(palabras) == 1:
+            palabra = palabras[0]
+            mayusculas = [c for c in palabra[1:] if c.isupper()]
+            return (palabra[0] + (mayusculas[0] if mayusculas else palabra[1:2])).upper()
+        return (palabras[0][0] + palabras[1][0]).upper()
 
     CAMPOS_COMPLETITUD = [
         ("legal_name", "Razón social"),
