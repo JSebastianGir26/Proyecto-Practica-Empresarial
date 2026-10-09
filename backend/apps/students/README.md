@@ -1,13 +1,12 @@
 # apps/students
 
-**Epica:** Epic 2 - Perfil del estudiante
+**Épica:** Epic 2 - Perfil del estudiante
 **Historias de usuario:** HU-04 Editar mi perfil, HU-05 Subir hoja de vida
 
-Esta app todavia esta vacia — es un placeholder para que el equipo
-tenga claro donde va a vivir este trabajo cuando se tome en un
-proximo sprint. No agregues codigo aqui hasta que la historia
-correspondiente este planificada.
+Implementada en el MVP.
 
-Al implementarla, sigue la misma estructura que `apps/accounts`:
-`models.py`, `serializers.py`, `views.py`, `urls.py`, `admin.py`,
-`permissions.py` si aplica, y pruebas en `tests/`.
+- `StudentProfile` (1:1 con `User`): carrera, institución, semestre, ciudad, sobre mí, habilidades y hoja de vida (PDF).
+- `completion()` y `missing_fields()` calculan el % de perfil completo (HU-04).
+- La hoja de vida se valida en `serializers.CVUploadSerializer`: solo PDF real (firma `%PDF-`) de máximo 5 MB.
+
+Pruebas en `tests/`: cada escenario Gherkin del backlog tiene al menos una.

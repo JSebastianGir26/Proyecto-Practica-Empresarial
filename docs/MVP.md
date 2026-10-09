@@ -28,9 +28,11 @@ Todas vienen de `docs/backlog/PRACTIYA_BACKLOG.xlsx`, donde están sus criterios
 | HU-10 | Seguir mis postulaciones | 3 · Búsqueda | Media | 3 | `applications` | `/postulaciones` |
 | HU-16 | Gestionar postulantes | 5 · Empresa | Alta | 8 | `applications` | `/postulantes` |
 
+> **Estado (octubre 2026):** las 11 historias están implementadas en la rama `feature/mvp` (backend con pruebas + pantallas), incluida una pantalla `/moderacion` además del Django Admin. Falta: revisión del equipo, unir a `develop`/`main` y la verificación en producción (Sprint 4).
+
 **Total: 53 puntos.** HU-04 y HU-14 son la versión mínima: los campos necesarios para postularse y para publicar, sin foto ni porcentaje de completitud.
 
-**Decisión de alcance:** HU-19 se resuelve con el **Django Admin** (un campo `estado` en Empresa y Vacante, más acciones "Aprobar" y "Rechazar"). No se construye una pantalla aparte en Next.js para el MVP.
+**Decisión de alcance:** HU-19 se resuelve con un campo `estado` en Empresa y Vacante y las acciones "Aprobar" y "Rechazar", disponibles en el **Django Admin** y en una pantalla sencilla `/moderacion` (pantalla 13 del mockup) para el usuario con rol ADMIN.
 
 ## Qué queda fuera (después del MVP)
 

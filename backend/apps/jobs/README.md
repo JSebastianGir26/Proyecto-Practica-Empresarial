@@ -1,13 +1,12 @@
 # apps/jobs
 
-**Epica:** Epic 3 - Busqueda y postulacion (vacantes)
-**Historias de usuario:** HU-06 Buscar con filtros, HU-07a/b Compatibilidad, HU-08 Ver detalle y postularme, HU-09 Guardar vacante
+**Épica:** Epic 3 / Epic 5 - Vacantes
+**Historias de usuario:** HU-06 Buscar con filtros, HU-08 Ver detalle, HU-15 Publicar vacante
 
-Esta app todavia esta vacia — es un placeholder para que el equipo
-tenga claro donde va a vivir este trabajo cuando se tome en un
-proximo sprint. No agregues codigo aqui hasta que la historia
-correspondiente este planificada.
+Implementada en el MVP.
 
-Al implementarla, sigue la misma estructura que `apps/accounts`:
-`models.py`, `serializers.py`, `views.py`, `urls.py`, `admin.py`,
-`permissions.py` si aplica, y pruebas en `tests/`.
+- `Vacancy`: ciclo `BORRADOR → PENDIENTE → APROBADA ⇄ PAUSADA` (o `RECHAZADA`). Ver el diagrama en `models.py`.
+- `Vacancy.objects.visibles()` es lo único que puede ver un estudiante: vacantes aprobadas de empresas aprobadas.
+- Comando `python manage.py datos_demo` (en `management/commands/`).
+
+Pruebas en `tests/`: cada escenario Gherkin del backlog tiene al menos una.

@@ -130,6 +130,31 @@ Guarda. Render redespliega solo.
 
 Si el navegador muestra un error de **CORS** en la consola (F12), revisa el paso 4.
 
+### 5.1 Prueba del ciclo completo del MVP
+
+Con la versión de `main` desplegada, recorre el ciclo de `docs/MVP.md` en este orden (usa una ventana de incógnito por usuario):
+
+1. **Empresa:** regístrate como empresa → ves "Tu empresa está en revisión". Completa el perfil en *Empresa* y crea una vacante → queda "Pendiente de revisión".
+2. **Admin:** inicia sesión con el superusuario → `/moderacion` → aprueba la empresa y, en la pestaña *Vacantes pendientes*, la vacante.
+3. **Estudiante:** regístrate como estudiante → *Perfil*: completa los datos y sube un PDF → *Buscar* → abre la vacante → *Postularme* → queda "Aplicado".
+4. **Empresa:** *Postulantes* → "Ver hoja de vida" abre el PDF → cambia el estado a "Entrevista".
+5. **Estudiante:** *Postulaciones* muestra "Entrevista".
+
+Si "Ver hoja de vida" falla, revisa las claves `SUPABASE_S3_*` (paso 1.4): sin ellas los archivos se guardan en el disco de Render, que se borra en cada despliegue.
+
+### 5.2 Datos de demostración en producción (opcional, para la presentación)
+
+El plan gratis de Render no tiene consola, así que el comando se corre **desde tu computador** apuntando a Supabase. Solo el líder técnico, y solo si la base todavía no tiene usuarios reales:
+
+```bash
+# dentro de backend/, con el .venv activado (PowerShell: $env:VARIABLE="valor")
+export DATABASE_URL="<cadena Session pooler de Supabase>"
+export SUPABASE_S3_ENDPOINT="..." SUPABASE_S3_REGION="..." SUPABASE_S3_ACCESS_KEY_ID="..." SUPABASE_S3_SECRET_ACCESS_KEY="..."
+python manage.py datos_demo
+```
+
+Cierra esa terminal al terminar para no dejar las claves de producción cargadas.
+
 ---
 
 ## 6. Proteger las ramas en GitHub

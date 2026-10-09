@@ -74,10 +74,12 @@ Este repositorio es un **monorepo**: el backend y el frontend viven juntos para 
 │   └── src/
 │       ├── app/              # Pantallas (cada carpeta = una URL)
 │       │   ├── (auth)/       # /login, /register
-│       │   ├── (estudiante)/ # /inicio, /buscar, /postulaciones, /perfil ...
-│       │   └── (empresa)/    # /panel, /vacantes, /postulantes
-│       ├── lib/              # api.ts (llamadas a la API), auth.ts (sesión)
-│       └── types/            # Tipos de TypeScript compartidos
+│       │   ├── (estudiante)/ # /inicio, /buscar, /buscar/[id], /postulaciones, /perfil
+│       │   ├── (empresa)/    # /panel, /vacantes, /vacantes/nueva, /postulantes, /perfil-empresa
+│       │   └── (admin)/      # /moderacion
+│       ├── components/       # AppShell (navegación y permisos), ui.tsx (botones, campos, avisos…)
+│       ├── lib/              # api.ts (llamadas a la API), auth.ts (sesión), useApi.ts (cargar datos)
+│       └── types/            # Tipos de TypeScript de las respuestas de la API
 │
 ├── docs/
 │   ├── MVP.md                # Alcance del MVP y plan de sprints
@@ -170,7 +172,26 @@ npm run dev
 
 Abre http://localhost:3000/register, crea una cuenta y luego entra en http://localhost:3000/login.
 
-### 3.5 Antes de abrir un Pull Request
+### 3.5 Datos de demostración (opcional)
+
+Para probar sin crear todo a mano (con el `.venv` activado, dentro de `backend/`):
+
+```bash
+python manage.py datos_demo
+```
+
+Crea las empresas, vacantes, estudiantes y postulaciones del mockup. Todas las cuentas demo usan la contraseña `PractiYA2026!`:
+
+| Rol | Correo |
+|---|---|
+| Estudiante | `demo.mariacamila@practiya.co` |
+| Empresa (aprobada) | `demo.technova@practiya.co` |
+| Empresa (pendiente) | `demo.andina@practiya.co` |
+| Administrador | el que creaste con `createsuperuser` → entra a http://localhost:3000/moderacion |
+
+Se puede correr varias veces: lo que ya existe no se duplica.
+
+### 3.6 Antes de abrir un Pull Request
 
 ```bash
 # Backend (con el .venv activado, dentro de backend/)
@@ -201,6 +222,24 @@ Las claves de Supabase, Render y Vercel de producción **solo** las maneja el l�
 | POST | `/api/auth/register/` | HU-01 Crear cuenta | Cualquiera |
 | POST | `/api/auth/login/` | HU-02 Iniciar sesión | Cualquiera |
 | POST | `/api/auth/token/refresh/` | Renovar sesión | Con sesión |
+| GET | `/api/auth/me/` | Usuario actual | Con sesión |
+| GET, PATCH | `/api/estudiantes/perfil/` | HU-04 Editar mi perfil | Estudiante |
+| PUT, DELETE | `/api/estudiantes/perfil/hoja-de-vida/` | HU-05 Subir hoja de vida (PDF, máx. 5 MB) | Estudiante |
+| GET | `/api/vacantes/?q=&modalidad=&etapa=&ciudad=&page=` | HU-06 Buscar con filtros | Con sesión |
+| GET | `/api/vacantes/<id>/` | HU-08 Detalle de la vacante | Con sesión |
+| GET, POST | `/api/vacantes/mias/` | HU-15 Mis vacantes / crear borrador | Empresa |
+| GET, PATCH, DELETE | `/api/vacantes/mias/<id>/` | HU-15 Editar o eliminar vacante | Empresa |
+| POST | `/api/vacantes/mias/<id>/publicar/` · `pausar/` · `reanudar/` | HU-15 Cambiar estado de la vacante | Empresa |
+| GET, POST | `/api/postulaciones/` | HU-10 Mis postulaciones / HU-08 Postularme | Estudiante |
+| GET | `/api/postulaciones/empresa/?vacante=&estado=` | HU-16 Postulantes de mis vacantes | Empresa |
+| PATCH | `/api/postulaciones/<id>/estado/` | HU-16 Cambiar estado del postulante | Empresa |
+| GET, PATCH | `/api/empresas/perfil/` | HU-14 Perfil de empresa (JSON, o multipart con `logo`) | Empresa |
+| GET | `/api/empresas/panel/` | Métricas del panel de la empresa | Empresa |
+| GET | `/api/moderacion/resumen/` | HU-19 Contadores de pendientes | Admin |
+| GET | `/api/moderacion/empresas/?estado=` · `/api/moderacion/vacantes/?estado=` | HU-19 Colas de revisión | Admin |
+| POST | `/api/moderacion/empresas/<id>/aprobar/` · `rechazar/` (y lo mismo para `vacantes`) | HU-19 Aprobar o rechazar | Admin |
+
+**Reglas de visibilidad:** una empresa nace *Pendiente de revisión*. Un estudiante solo ve vacantes **aprobadas** de empresas **aprobadas**. Si una empresa edita una vacante ya revisada, vuelve a revisión.
 
 Esta tabla se actualiza en cada Pull Request que agregue un endpoint.
 
