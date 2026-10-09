@@ -1,73 +1,86 @@
 "use client";
 
-/**
- * Portada temporal de PractiYA.
- * Sirve para tener una URL publica mientras se construye el MVP: enlaza a
- * registro e inicio de sesion, y muestra si hay una sesion activa.
- * Se reemplaza por la portada real del mockup en un sprint posterior.
- */
-import { useEffect, useState } from "react";
+/** Portada de PractiYA. */
 import Link from "next/link";
-import { clearSession, getRole, homePathForRole } from "@/lib/auth";
+import { homePathForRole, useSession } from "@/lib/auth";
+import { IconBriefcase, IconChecklist, IconSearch } from "@/components/icons";
 
-const ROLE_LABEL: Record<string, string> = {
-  ESTUDIANTE: "Estudiante",
-  EMPRESA: "Empresa",
-  ADMIN: "Administrador",
-};
+const STEPS = [
+  { icon: IconSearch, title: "Busca", text: "Filtra pasantías por modalidad, etapa de formación y ciudad." },
+  { icon: IconBriefcase, title: "Postúlate", text: "Sube tu hoja de vida una vez y postúlate con un clic." },
+  { icon: IconChecklist, title: "Haz seguimiento", text: "Mira en qué va cada proceso: en revisión, entrevista o aceptado." },
+];
 
 export default function HomePage() {
-  const [role, setRole] = useState<string | null>(null);
-
-  useEffect(() => {
-    // La sesion vive en localStorage, que solo existe en el navegador.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setRole(getRole());
-  }, []);
-
-  function handleLogout() {
-    clearSession();
-    setRole(null);
-  }
+  const session = useSession();
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 p-6">
-      <div>
-        <h1 className="text-3xl font-semibold">PractiYA</h1>
-        <p className="mt-2 text-gray-600">
-          La red donde estudiantes y empresas se encuentran para contratos de aprendizaje.
-        </p>
-      </div>
-
-      {role ? (
-        <div className="space-y-3 rounded border p-4">
-          <p>
-            Sesión iniciada como <strong>{ROLE_LABEL[role] ?? role}</strong>.
-          </p>
-          <div className="flex gap-2">
-            <Link
-              href={homePathForRole(role)}
-              className="flex-1 rounded bg-blue-600 py-2 text-center text-white"
-            >
-              Ir a mi inicio
-            </Link>
-            <button onClick={handleLogout} className="flex-1 rounded border py-2">
-              Cerrar sesión
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="flex gap-2">
-          <Link href="/register" className="flex-1 rounded bg-blue-600 py-2 text-center text-white">
-            Crear cuenta
+    <div className="min-h-screen">
+      <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
+        <span className="text-[22px] font-bold">PractiYA</span>
+        {session ? (
+          <Link href={homePathForRole(session.role)} className="btn btn-primary btn-sm">
+            Ir a mi inicio
           </Link>
-          <Link href="/login" className="flex-1 rounded border py-2 text-center">
+        ) : (
+          <Link href="/login" className="btn btn-ghost btn-sm">
             Iniciar sesión
           </Link>
-        </div>
-      )}
+        )}
+      </header>
 
-      <p className="text-xs text-gray-400">Versión en construcción · Sprint 1</p>
-    </main>
+      <main className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
+        <section className="flex flex-col gap-6 py-12 sm:py-20 lg:max-w-3xl">
+          <p className="text-[14px] font-semibold uppercase tracking-[0.06em] text-brand-700">Contratos de aprendizaje</p>
+          <h1 className="text-[38px] font-bold leading-[1.08] sm:text-[52px]">
+            Tu práctica empieza aquí.
+          </h1>
+          <p className="max-w-2xl text-[18px] leading-relaxed text-ink-2">
+            PractiYA conecta a estudiantes de universidades públicas, privadas y del SENA con empresas que buscan a quién
+            formar mediante contratos de aprendizaje.
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            {session ? (
+              <Link href={homePathForRole(session.role)} className="btn btn-primary btn-lg">
+                Ir a mi inicio
+              </Link>
+            ) : (
+              <>
+                <Link href="/register" className="btn btn-primary btn-lg">
+                  Crear cuenta gratis
+                </Link>
+                <Link href="/login" className="btn btn-secondary btn-lg">
+                  Ya tengo cuenta
+                </Link>
+              </>
+            )}
+          </div>
+        </section>
+
+        <section className="grid gap-4 sm:grid-cols-3">
+          {STEPS.map(({ icon: Icon, title, text }) => (
+            <div key={title} className="card flex flex-col gap-2.5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-brand-100 text-brand-900">
+                <Icon size={20} />
+              </div>
+              <p className="text-[18px] font-semibold">{title}</p>
+              <p className="text-[15px] text-ink-2">{text}</p>
+            </div>
+          ))}
+        </section>
+
+        <section className="mt-6 flex flex-col gap-4 rounded-2xl bg-brand-900 p-6 text-white sm:flex-row sm:items-center sm:justify-between sm:p-8">
+          <div>
+            <p className="text-[20px] font-semibold">¿Eres una empresa?</p>
+            <p className="mt-1 text-brand-50">Publica tus vacantes de contrato de aprendizaje y gestiona a tus postulantes en un solo lugar.</p>
+          </div>
+          {!session && (
+            <Link href="/register" className="btn shrink-0 bg-white text-brand-900 hover:bg-brand-100 hover:text-brand-900">
+              Registrar mi empresa
+            </Link>
+          )}
+        </section>
+      </main>
+    </div>
   );
 }

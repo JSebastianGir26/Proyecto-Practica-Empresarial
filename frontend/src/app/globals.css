@@ -1,3 +1,131 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Componentes base del mockup (docs/diseno, "Pantallas complementarias").
+ * Úsalos como clases: <button className="btn btn-primary">.
+ */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-canvas font-serif text-[15px] leading-relaxed text-ink antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-semibold leading-tight tracking-[-0.01em] text-balance;
+  }
+  a {
+    @apply text-brand-700 hover:text-brand-900;
+  }
+  :focus-visible {
+    @apply outline outline-2 outline-offset-2 outline-brand-500;
+  }
+}
+
+@layer components {
+  /* --- Botones (primario, secundario, fantasma, destructivo) --- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-btn px-4 py-2.5 text-[14px] font-semibold
+      transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply bg-brand-700 text-white hover:bg-brand-900 hover:text-white;
+  }
+  .btn-secondary {
+    @apply border-[1.5px] border-brand-700 bg-transparent py-2 text-brand-700 hover:bg-brand-100;
+  }
+  .btn-ghost {
+    @apply border border-line bg-white py-2 text-brand-700 hover:border-brand-500 hover:bg-brand-100;
+  }
+  .btn-danger {
+    @apply border border-rose-text bg-rose-bg py-2 text-rose-text hover:bg-[#ffe3ea];
+  }
+  .btn-lg {
+    @apply px-5 py-3.5 text-[16px];
+  }
+  .btn-sm {
+    @apply px-3 py-1.5 text-[13px];
+  }
+
+  /* --- Formularios --- */
+  .field-label {
+    @apply text-[12.5px] font-bold uppercase tracking-[0.03em] text-ink-2;
+  }
+  .input {
+    @apply w-full rounded-btn border border-line bg-soft px-3.5 py-3 font-serif text-[15px] text-ink
+      placeholder:text-ink-3 hover:border-[#c9c6c6] focus:border-brand-500 focus:bg-white focus:outline-none;
+  }
+  .input-error {
+    @apply border-rose-text bg-rose-bg;
+  }
+  .field-error {
+    @apply text-[13px] text-rose-text;
+  }
+
+  /* --- Píldoras de filtro y segmentado --- */
+  .pill {
+    @apply cursor-pointer whitespace-nowrap rounded-full border border-line bg-white px-3.5 py-2 text-[14px] text-ink-2
+      hover:border-brand-500;
+  }
+  .pill-active {
+    @apply border-brand-700 bg-brand-700 text-white hover:border-brand-700;
+  }
+
+  /* --- Chips de estado --- */
+  .chip {
+    @apply inline-flex items-center whitespace-nowrap rounded-full px-3 py-1 text-[12.5px] font-semibold;
+  }
+  .chip-info {
+    @apply bg-brand-100 text-brand-900;
+  }
+  .chip-bright {
+    @apply bg-brand-50 text-brand-500;
+  }
+  .chip-neutral {
+    @apply bg-line text-ink-2;
+  }
+  .chip-success {
+    @apply bg-rose-bg text-rose-text;
+  }
+  .tagchip {
+    @apply inline-flex items-center gap-1.5 rounded-lg bg-brand-100 px-3 py-1.5 text-[13.5px] font-semibold text-brand-900;
+  }
+
+  /* --- Tarjetas --- */
+  .card {
+    @apply rounded-2xl border border-line bg-white p-5 sm:p-6;
+  }
+  .card-soft {
+    @apply rounded-2xl border border-line bg-soft p-5 sm:p-6;
+  }
+  .kicker {
+    @apply text-[12.5px] font-bold uppercase tracking-[0.04em] text-brand-500;
+  }
+  .section-title {
+    @apply text-[19px] font-semibold;
+  }
+
+  /* --- Paginación --- */
+  .pagebtn {
+    @apply flex h-9 min-w-9 items-center justify-center rounded-btn border border-line bg-white px-2 text-[14px] text-ink-2
+      hover:border-brand-500 disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .pagebtn-active {
+    @apply border-brand-700 bg-brand-700 text-white hover:border-brand-700;
+  }
+
+  /* --- Tablas: los encabezados no se cortan (docs/diseno, punto 1) --- */
+  .table {
+    @apply w-full border-collapse text-left;
+  }
+  .table th {
+    @apply whitespace-nowrap px-3.5 pb-3 text-[12.5px] font-bold uppercase tracking-[0.03em] text-ink-2;
+  }
+  .table td {
+    @apply border-t border-line px-3.5 py-4 align-middle text-[15px];
+  }
+}

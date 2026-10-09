@@ -1,119 +1,161 @@
 "use client";
 
 /**
- * HU-01 · Crear cuenta (T4 — Desarrollador 4)
+ * HU-01 · Crear cuenta (mockup, pantalla 07)
  *
- * Un solo formulario con selector de rol (Estudiante / Empresa) — no
- * dos pantallas separadas, para no duplicar la validacion de
- * contrasenas y terminos. Consume POST /api/auth/register/ (T2).
- *
- * Escenarios Gherkin a cubrir (ver docs/backlog):
- *   - Registro exitoso -> redirige a /inicio
- *   - No acepta terminos -> mensaje de error, no crea la cuenta
- *   - Contrasenas no coinciden -> "Las contrasenas no coinciden"
+ * Un solo formulario con selector de rol (Estudiante / Empresa).
+ * Escenarios Gherkin:
+ *   - Registro exitoso → entra a su pantalla de inicio
+ *   - No acepta términos → mensaje de error, no crea la cuenta
+ *   - Contraseñas no coinciden → "Las contraseñas no coinciden"
  */
-import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { apiFetch, ApiError } from "@/lib/api";
-import { saveSession, homePathForRole, LoginResponse } from "@/lib/auth";
+import { useState } from "react";
+import { apiFetch, ApiError, errorMessage } from "@/lib/api";
+import { homePathForRole, saveSession, type LoginResponse } from "@/lib/auth";
+import { Spinner, TextField } from "@/components/ui";
+import { IconCheck } from "@/components/icons";
 
 type Role = "ESTUDIANTE" | "EMPRESA";
+type Errors = Partial<Record<"full_name" | "email" | "password" | "password_confirm" | "terms_accepted" | "form", string>>;
 
 export default function RegisterPage() {
   const router = useRouter();
   const [role, setRole] = useState<Role>("ESTUDIANTE");
-  const [error, setError] = useState<string | null>(null);
+  const [terms, setTerms] = useState(false);
+  const [errors, setErrors] = useState<Errors>({});
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError(null);
-
     const form = new FormData(e.currentTarget);
-    const password = form.get("password") as string;
-    const passwordConfirm = form.get("password_confirm") as string;
-    const termsAccepted = form.get("terms_accepted") === "on";
+    const fullName = String(form.get("full_name")).trim();
+    const email = String(form.get("email")).trim().toLowerCase();
+    const password = String(form.get("password"));
+    const passwordConfirm = String(form.get("password_confirm"));
 
-    if (!termsAccepted) {
-      setError("Debes aceptar los terminos y el tratamiento de datos.");
-      return;
-    }
-    if (password !== passwordConfirm) {
-      setError("Las contrasenas no coinciden");
-      return;
-    }
+    const found: Errors = {};
+    if (!fullName) found.full_name = role === "EMPRESA" ? "Escribe el nombre de la empresa." : "Escribe tu nombre completo.";
+    if (!/^\S+@\S+\.\S+$/.test(email)) found.email = "Escribe un correo válido.";
+    if (password.length < 8) found.password = "La contraseña debe tener mínimo 8 caracteres.";
+    if (password !== passwordConfirm) found.password_confirm = "Las contraseñas no coinciden";
+    if (!terms) found.terms_accepted = "Debes aceptar los términos y el tratamiento de datos.";
+    setErrors(found);
+    if (Object.keys(found).length) return;
 
     setLoading(true);
     try {
       await apiFetch("/auth/register/", {
         method: "POST",
-        body: JSON.stringify({
-          email: form.get("email"),
-          username: form.get("username"),
-          password,
-          password_confirm: passwordConfirm,
-          role,
-          terms_accepted: termsAccepted,
-        }),
+        auth: false,
+        body: { full_name: fullName, email, password, password_confirm: passwordConfirm, role, terms_accepted: terms },
       });
-
-      // HU-01: "mi cuenta queda creada Y entro a la pantalla de Inicio".
-      // Para entrar hay que iniciar sesion con los mismos datos.
+      // "Mi cuenta queda creada Y entro a la pantalla de Inicio".
       const session = await apiFetch<LoginResponse>("/auth/login/", {
         method: "POST",
-        body: JSON.stringify({ email: form.get("email"), password }),
+        auth: false,
+        body: { email, password },
       });
       saveSession(session);
-      router.push(homePathForRole(session.role));
+      router.replace(homePathForRole(session.role));
     } catch (err) {
-      if (err instanceof ApiError) {
-        setError("No se pudo crear la cuenta. Revisa los datos ingresados.");
+      if (err instanceof ApiError && err.status === 400) {
+        const fields = err.fieldErrors();
+        setErrors({
+          full_name: fields.full_name,
+          email: fields.email,
+          password: fields.password,
+          password_confirm: fields.password_confirm,
+          terms_accepted: fields.terms_accepted,
+          form: Object.keys(fields).length ? undefined : errorMessage(err),
+        });
       } else {
-        setError("Error de conexion. Intenta de nuevo.");
+        setErrors({ form: errorMessage(err, "No se pudo crear la cuenta. Intenta de nuevo.") });
       }
-    } finally {
       setLoading(false);
     }
   }
 
   return (
-    <main className="mx-auto max-w-md p-6">
-      <h1 className="text-2xl font-semibold mb-4">Crear una cuenta</h1>
-
-      <div className="mb-4 flex gap-2">
-        <button
-          type="button"
-          onClick={() => setRole("ESTUDIANTE")}
-          className={`flex-1 rounded border px-3 py-2 ${role === "ESTUDIANTE" ? "bg-blue-600 text-white" : ""}`}
-        >
-          Estudiante
-        </button>
-        <button
-          type="button"
-          onClick={() => setRole("EMPRESA")}
-          className={`flex-1 rounded border px-3 py-2 ${role === "EMPRESA" ? "bg-blue-600 text-white" : ""}`}
-        >
-          Empresa
-        </button>
+    <div className="flex flex-col gap-6">
+      <div className="inline-flex w-fit rounded-full border border-line bg-soft p-1" role="radiogroup" aria-label="Tipo de cuenta">
+        {(["ESTUDIANTE", "EMPRESA"] as Role[]).map((r) => (
+          <button
+            key={r}
+            type="button"
+            role="radio"
+            aria-checked={role === r}
+            onClick={() => setRole(r)}
+            className={`rounded-full px-5 py-2 text-[14px] font-semibold ${role === r ? "bg-brand-700 text-white" : "text-ink-2"}`}
+          >
+            {r === "ESTUDIANTE" ? "Estudiante" : "Empresa"}
+          </button>
+        ))}
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <input name="username" placeholder="Nombre" required className="w-full rounded border px-3 py-2" />
-        <input name="email" type="email" placeholder="Correo" required className="w-full rounded border px-3 py-2" />
-        <input name="password" type="password" placeholder="Contrasena" required className="w-full rounded border px-3 py-2" />
-        <input name="password_confirm" type="password" placeholder="Confirmar contrasena" required className="w-full rounded border px-3 py-2" />
+      <div>
+        <h1 className="text-[30px]">Crear una cuenta</h1>
+        <p className="mt-1.5 text-[16px] text-ink-2">
+          {role === "ESTUDIANTE"
+            ? "Regístrate para empezar a buscar pasantías con contrato de aprendizaje."
+            : "Regístrate para publicar vacantes de contrato de aprendizaje. Un administrador revisará tu empresa antes de que tus vacantes sean visibles."}
+        </p>
+      </div>
 
-        <label className="flex items-center gap-2 text-sm">
-          <input name="terms_accepted" type="checkbox" />
-          Acepto los terminos y el tratamiento de datos
-        </label>
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+        <TextField
+          label={role === "ESTUDIANTE" ? "Nombre completo" : "Nombre de la empresa"}
+          name="full_name"
+          placeholder={role === "ESTUDIANTE" ? "María Camila Ruiz" : "TechNova S.A.S."}
+          autoComplete={role === "ESTUDIANTE" ? "name" : "organization"}
+          error={errors.full_name}
+          maxLength={150}
+        />
+        <TextField label="Correo electrónico" name="email" type="email" placeholder="nombre@correo.com" autoComplete="email" error={errors.email} />
+        <TextField label="Contraseña" name="password" type="password" placeholder="Mínimo 8 caracteres" autoComplete="new-password" error={errors.password} />
+        <TextField label="Confirmar contraseña" name="password_confirm" type="password" placeholder="Repite tu contraseña" autoComplete="new-password" error={errors.password_confirm} />
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        <div>
+          <label className="flex cursor-pointer items-start gap-2.5 text-[14px] leading-snug text-ink-2">
+            <input
+              type="checkbox"
+              checked={terms}
+              onChange={(e) => setTerms(e.target.checked)}
+              className="peer sr-only"
+              aria-invalid={Boolean(errors.terms_accepted)}
+            />
+            <span
+              className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-[5px] border-[1.5px] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-brand-500 ${
+                terms ? "border-brand-700 bg-brand-700 text-white" : errors.terms_accepted ? "border-rose-text bg-white" : "border-[#bab6b6] bg-white"
+              }`}
+              aria-hidden="true"
+            >
+              {terms && <IconCheck size={13} />}
+            </span>
+            <span>
+              He leído y acepto los términos y condiciones y el tratamiento de datos personales, incluyendo el manejo de mi
+              hoja de vida y datos de contrato de aprendizaje.
+            </span>
+          </label>
+          {errors.terms_accepted && <p className="field-error mt-2">{errors.terms_accepted}</p>}
+        </div>
 
-        <button type="submit" disabled={loading} className="w-full rounded bg-blue-600 py-2 text-white disabled:opacity-50">
-          {loading ? "Creando cuenta..." : "Crear cuenta"}
+        {errors.form && (
+          <p className="rounded-btn bg-rose-bg px-3.5 py-2.5 text-[14px] text-rose-text" role="alert">
+            {errors.form}
+          </p>
+        )}
+
+        <button type="submit" disabled={loading} className="btn btn-primary btn-lg w-full">
+          {loading && <Spinner />}
+          {loading ? "Creando cuenta…" : "Crear cuenta"}
         </button>
       </form>
-    </main>
+
+      <p className="text-center text-[15px] text-ink-2">
+        ¿Ya tienes cuenta? <Link href="/login">Inicia sesión</Link>
+      </p>
+    </div>
   );
 }
